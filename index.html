@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Log Profile Digitizer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#0E1A29;
+  --panel:#152436;
+  --panel-2:#1B2E44;
+  --line:#28405C;
+  --text:#E7EEF5;
+  --muted:#84A0BE;
+  --amber:#FF8A3D;
+  --grid:rgba(79,209,232,0.08);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 15% -10%, #16283F 0%, transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  padding:32px;
+  min-height:100vh;
+}
+.wrap{max-width:1180px;margin:0 auto;}
+
+header{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+  padding-bottom:16px;
+  margin-bottom:24px;
+  flex-wrap:wrap;
+  gap:8px;
+}
+h1{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:22px;
+  font-weight:700;
+  margin:0;
+  letter-spacing:0.2px;
+}
+h1 span{color:var(--amber);}
+.sub{color:var(--muted);font-size:13px;font-family:'JetBrains Mono',monospace;}
+
+.grid{
+  display:grid;
+  grid-template-columns:340px 1fr;
+  gap:20px;
+}
+@media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:18px 20px;
+}
+.panel h2{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  color:var(--muted);
+  margin:0 0 14px 0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.panel h2::before{
+  content:"";
+  width:6px;height:6px;border-radius:50%;
+  background:var(--amber);
+  box-shadow:0 0 8px var(--amber);
+}
+
+label{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:4px;
+  font-family:'JetBrains Mono',monospace;
+}
+.field{margin-bottom:14px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+input[type=number]{
+  width:100%;
+  background:var(--panel-2);
+  border:1px solid var(--line);
+  color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  padding:8px 10px;
+  border-radius:6px;
+  outline:none;
+}
+input[type=number]:focus{border-color:var(--amber);}
+.checkline{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;
+  margin-top:2px;
+}
+.hint{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;}
+
+.legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--muted);}
+.dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+.stats{margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);line-height:1.7;}
+.stats b{color:var(--text);}
+
+svg{width:100%;height:auto;display:block;}
+.preview-wrap{position:relative;}
+
+.tablewrap{
+  overflow-x:auto;
+  margin-top:20px;
+}
+table{
+  border-collapse:collapse;
+  width:100%;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+}
+th,td{
+  border:1px solid var(--line);
+  padding:5px 4px;
+  text-align:center;
+}
+th{
+  background:var(--panel-2);
+  color:var(--muted);
+  font-weight:500;
+  font-size:11px;
+}
+td.rowhead{
+  background:var(--panel-2);
+  color:var(--text);
+  font-size:11px;
+  white-space:nowrap;
+  padding:5px 10px;
+  text-align:left;
+}
+td input{
+  width:56px;
+  background:transparent;
+  border:none;
+  color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  text-align:center;
+  padding:4px 2px;
+  border-radius:4px;
+}
+td input:focus{background:var(--panel-2);outline:1px solid var(--amber);}
+
+.downloads{
+  margin-top:22px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+button{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:600;
+  font-size:13px;
+  border-radius:7px;
+  padding:10px 16px;
+  border:1px solid var(--line);
+  background:var(--panel-2);
+  color:var(--text);
+  cursor:pointer;
+  transition:border-color .15s, transform .1s;
+}
+button:hover{border-color:var(--amber);}
+button:active{transform:scale(0.98);}
+button.primary{
+  background:var(--amber);
+  color:#241505;
+  border-color:var(--amber);
+}
+button.primary:hover{filter:brightness(1.08);}
+
+.note{
+  margin-top:16px;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.6;
+  border-left:2px solid var(--line);
+  padding-left:12px;
+}
+.note b{color:var(--text);}
+footer{margin-top:30px;color:var(--muted);font-size:11px;font-family:'JetBrains Mono',monospace;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Log Profile <span>Digitizer</span></h1>
+  <div class="sub" id="subHeader">horizontal-laser · 4 sections · 10-point decagon</div>
+</header>
+
+<div class="grid">
+
+  <!-- LEFT: SETUP -->
+  <div class="panel">
+    <h2>Rig setup</h2>
+    <div class="field">
+      <label>Laser line height above spindle centerline (mm)</label>
+      <input type="number" id="refHeight" value="300" step="0.1">
+    </div>
+    <div class="field">
+      <label>Section spacing along log axis (mm)</label>
+      <input type="number" id="spacing" value="150" step="1">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Number of sections</label>
+        <input type="number" id="numSections" value="4" step="1" min="1" max="12">
+      </div>
+      <div class="field">
+        <label>Angle points per section</label>
+        <input type="number" id="numAngles" value="10" step="1" min="3" max="36">
+      </div>
+    </div>
+    <div class="hint">Changing either of these rebuilds the table below with fresh placeholder data — enter your real measurements after adjusting.</div>
+
+    <div class="checkline" style="margin-top:12px;">
+      <input type="checkbox" id="reverseDir">
+      <label style="margin:0;" for="reverseDir">Reverse rotation indexing (flip if profile looks mirrored)</label>
+    </div>
+    <div class="checkline">
+      <input type="checkbox" id="flipVertical">
+      <label style="margin:0;" for="flipVertical">Flip vertical (Z) orientation — fixes needing to mirror the loft body after import</label>
+    </div>
+
+    <div class="legend" id="legendBox"></div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="note">
+      <b>How radius is derived:</b> the laser points straight down and always reads the distance to whichever point is currently the log's <b>top surface</b> at that rotation. So radius = laser height − measured distance. Rotating the log walks that fixed downward-looking measurement point around the material, tracing the true (non-circular) cross-section.
+    </div>
+  </div>
+
+  <!-- RIGHT: PREVIEW -->
+  <div class="panel">
+    <h2 id="previewHeading">End-on preview (all sections overlaid)</h2>
+    <div class="preview-wrap">
+      <svg id="preview" viewBox="0 0 520 520"></svg>
+    </div>
+    <div class="downloads" id="downloadBtns"></div>
+  </div>
+
+</div>
+
+<!-- DATA TABLE -->
+<div class="panel" style="margin-top:20px;">
+  <h2>Import / Export measurements</h2>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Import: paste the contents of a <code>log_digitizer_import_*.json</code> file (from a capture script, or exported below) then click Load. This overwrites the table and updates the section/angle counts to match.</div>
+  <textarea id="importBox" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;border-radius:6px;padding:8px;" placeholder='{"refHeight":300,"spacing":150,"numAngles":10,"sections":[[...values],[...],...]}'></textarea>
+  <div style="margin-top:8px;"><button onclick="loadImport()">Load</button> <span id="importStatus" style="font-size:12px;color:var(--muted);margin-left:8px;"></span></div>
+  <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);">Export: save whatever's currently in the table below as a <code>log_digitizer_import_*.json</code> file — same format the Fusion spline-sketch script reads, so manually-entered data works with it too, not just the capture scripts.</div>
+  <div style="margin-top:8px;"><button onclick="exportMeasurementsJSON()">Export current table as JSON</button></div>
+</div>
+
+<div class="panel tablewrap" style="margin-top:20px;">
+  <h2>Measured distance: laser line → log <u>top</u> surface (mm)</h2>
+  <table id="datatable"></table>
+</div>
+
+<div class="note" style="max-width:900px;">
+  <b>Using this in Fusion 360:</b> the simplest path is the combined <b>3D reference</b> file below — import it as a 3D sketch, apply the mirror step described next, then <b>Loft</b> across all the profiles directly from that one sketch. The per-section files above (create <span id="planeCountLabel">4</span> offset planes along your loft axis at Y = <span id="zListSummary">0, 150, 300, 450 mm</span>, insert one section DXF per plane) are the alternative if you'd rather work plane-by-plane instead. For a single-face smooth loft instead of a faceted one, use the separate Fusion spline-sketch script rather than these DXF exports.
+  <br><br>
+  <b>Orientation:</b> the 0° reading (first laser measurement, before any rotation) is exported straight up the sketch's local +Y axis, matching the physical "top of log" position. After importing the 3D reference sketch, apply <b>Modify → Mirror</b> across the origin <b>XY plane</b> once — this has been confirmed to correct the orientation reliably. Do this every time as a standard step; it's a single consistent correction, not something to chase out of the export file.
+  <br><br>
+  <b>If you've had to mirror the finished loft body through the XY plane to make it look right:</b> that's a sign your planes' local Y is mapping to global −Z instead of +Z, flipping "top of log" to "bottom of log" on import. Rather than mirroring the assembled 3D body after the fact each time, tick <b>"Flip vertical (Z) orientation"</b> above and re-download the section DXFs — this corrects it at the source, before it ever reaches Fusion, so the loft comes out right without a manual mirror step.
+  <br><br>
+  <b>Verifying orientation after import:</b> Fusion's DXF importer silently drops TEXT and POINT entities (it only keeps solids/curves/surfaces/meshes) — so instead of text labels, each section DXF marks every point with a small <b>circle</b>, sized to grow from smallest (0°) to largest around the sequence, plus a <b>radial line</b> pointing straight at the 0° point with a double-ringed circle marking it specifically. After inserting a sketch, find the double-ring circle — that's your C=0 reference — and check that the radial line points the same real-world direction (relative to your known headstock/tailstock/up reference) on every section. These markers sit on their own layers (C0_MARK, ANGLE_MARK) so you can hide them once orientation's confirmed, without touching the profile geometry itself.
+</div>
+
+<footer id="footerText">10 points per section · 36° increments · values are example placeholders until you overwrite them</footer>
+</div>
+
+<script>
+function getNumSections(){
+  let n = parseInt(document.getElementById('numSections').value) || 4;
+  n = Math.max(1, Math.min(12, n));
+  return n;
+}
+function getNumAngles(){
+  let n = parseInt(document.getElementById('numAngles').value) || 10;
+  n = Math.max(3, Math.min(36, n));
+  return n;
+}
+function colorForIndex(i, total){
+  const hue = Math.round((360 * i / Math.max(total, 1)) % 360);
+  return `hsl(${hue}, 68%, 62%)`;
+}
+
+function generateDefaultRow(numAngles, seedOffset){
+  const base = 220;
+  const row = [];
+  for(let i=0;i<numAngles;i++){
+    const angle = i * (360/numAngles);
+    const wobble = 25*Math.sin((angle+seedOffset)*Math.PI/180*2) + 10*Math.sin((angle+seedOffset*1.7)*Math.PI/180*5);
+    row.push(Math.round((base - wobble)*10)/10);
+  }
+  return row;
+}
+
+function buildLegend(numSections, spacing){
+  const box = document.getElementById('legendBox');
+  let html = '';
+  for(let s=0;s<numSections;s++){
+    html += `<div class="legend-item"><span class="dot" style="background:${colorForIndex(s,numSections)}"></span>Section ${s+1} · Y=${Math.round(s*spacing)}</div>`;
+  }
+  box.innerHTML = html;
+}
+
+function buildDownloadButtons(numSections){
+  const box = document.getElementById('downloadBtns');
+  let html = '';
+  for(let s=0;s<numSections;s++){
+    html += `<button onclick="downloadSection(${s})">Download Section ${s+1} DXF</button>`;
+  }
+  html += `<button class="primary" onclick="downloadReference3D()">Download 3D reference DXF (all sections)</button>`;
+  html += `<button onclick="downloadGcode()">Generate G-code for this setup</button>`;
+  box.innerHTML = html;
+}
+
+function buildTable(){
+  const numSections = getNumSections();
+  const numAngles = getNumAngles();
+  const angleStep = 360/numAngles;
+  const table = document.getElementById('datatable');
+  let html = '<tr><th style="text-align:left;">Section</th>';
+  for(let i=0;i<numAngles;i++){ html += `<th>${Math.round(i*angleStep)}°</th>`; }
+  html += '</tr>';
+  for(let s=0;s<numSections;s++){
+    const rowDefaults = generateDefaultRow(numAngles, s*23);
+    html += `<tr><td class="rowhead" style="border-left:3px solid ${colorForIndex(s,numSections)};">Section ${s+1}</td>`;
+    for(let i=0;i<numAngles;i++){
+      html += `<td><input type="number" step="0.1" data-s="${s}" data-i="${i}" value="${rowDefaults[i]}" onchange="recompute()"></td>`;
+    }
+    html += '</tr>';
+  }
+  table.innerHTML = html;
+  buildLegend(numSections, parseFloat(document.getElementById('spacing').value)||0);
+  buildDownloadButtons(numSections);
+}
+
+function getMeasurements(numSections, numAngles){
+  const vals = [];
+  for(let s=0;s<numSections;s++) vals.push(new Array(numAngles).fill(0));
+  document.querySelectorAll('#datatable input').forEach(inp=>{
+    const s = +inp.dataset.s, i = +inp.dataset.i;
+    if(vals[s]) vals[s][i] = parseFloat(inp.value) || 0;
+  });
+  return vals;
+}
+
+function exportMeasurementsJSON(){
+  const numSections = getNumSections();
+  const numAngles = getNumAngles();
+  const refHeight = parseFloat(document.getElementById('refHeight').value) || 0;
+  const spacing = parseFloat(document.getElementById('spacing').value) || 0;
+  const sections = getMeasurements(numSections, numAngles);
+  const payload = { refHeight, spacing, numAngles, sections };
+  triggerDownload(`log_digitizer_import_${Date.now()}.json`, JSON.stringify(payload, null, 2));
+}
+
+function computePoints(){
+  const H = parseFloat(document.getElementById('refHeight').value) || 0;
+  const rev = document.getElementById('reverseDir').checked ? -1 : 1;
+  const flipV = document.getElementById('flipVertical').checked ? -1 : 1;
+  const numSections = getNumSections();
+  const numAngles = getNumAngles();
+  const angleStep = 360/numAngles;
+  const meas = getMeasurements(numSections, numAngles);
+  const sections = [];
+  for(let s=0;s<numSections;s++){
+    const pts = [];
+    for(let i=0;i<numAngles;i++){
+      const r = H - meas[s][i];
+      const theta = rev * i * angleStep * Math.PI/180 + Math.PI/2;
+      pts.push({x: r*Math.cos(theta), y: flipV*r*Math.sin(theta), r, angleDeg: Math.round(i*angleStep)});
+    }
+    sections.push(pts);
+  }
+  return sections;
+}
+
+function drawPreview(sections){
+  const svg = document.getElementById('preview');
+  const size = 520, c = size/2;
+  let maxR = 10;
+  sections.forEach(pts => pts.forEach(p => { maxR = Math.max(maxR, Math.abs(p.x), Math.abs(p.y)); }));
+  const scale = (size*0.42) / maxR;
+
+  let el = '';
+  for(let g=1; g<=4; g++){
+    const rr = (maxR*scale) * (g/4);
+    el += `<circle cx="${c}" cy="${c}" r="${rr}" fill="none" stroke="${'rgba(79,209,232,0.08)'}" stroke-width="1"/>`;
+  }
+  el += `<line x1="${c-size*0.46}" y1="${c}" x2="${c+size*0.46}" y2="${c}" stroke="#28405C" stroke-width="1"/>`;
+  el += `<line x1="${c}" y1="${c-size*0.46}" x2="${c}" y2="${c+size*0.46}" stroke="#28405C" stroke-width="1"/>`;
+
+  sections.forEach((pts, s)=>{
+    const color = colorForIndex(s, sections.length);
+    const path = pts.map((p,idx)=> `${idx===0?'M':'L'} ${c+p.x*scale} ${c - p.y*scale}`).join(' ') + ' Z';
+    el += `<path d="${path}" fill="${color}" fill-opacity="0.13" stroke="${color}" stroke-width="2"/>`;
+    pts.forEach(p=>{
+      el += `<circle cx="${c+p.x*scale}" cy="${c-p.y*scale}" r="2.5" fill="${color}"/>`;
+    });
+  });
+
+  el += `<circle cx="${c}" cy="${c}" r="3" fill="#E7EEF5"/>`;
+  el += `<text x="${c+8}" y="${c-8}" fill="#84A0BE" font-family="JetBrains Mono" font-size="10">spindle axis</text>`;
+
+  svg.innerHTML = el;
+}
+
+function updateDynamicText(numSections, numAngles, angleStep, spacing){
+  document.getElementById('subHeader').textContent =
+    `horizontal-laser · ${numSections} section${numSections!==1?'s':''} · ${numAngles}-point profile`;
+  document.getElementById('footerText').textContent =
+    `${numAngles} points per section · ${angleStep.toFixed(1)}° increments · values are example placeholders until you overwrite them`;
+  document.getElementById('previewHeading').textContent =
+    `End-on preview (all ${numSections} section${numSections!==1?'s':''} overlaid)`;
+  const zs = [];
+  for(let s=0;s<numSections;s++) zs.push(Math.round(s*spacing));
+  document.getElementById('zListSummary').textContent = zs.join(', ') + ' mm';
+  document.getElementById('planeCountLabel').textContent = numSections;
+}
+
+function maxChordDiameter(pts){
+  // True geometric "diameter": largest straight-line distance between any
+  // two points in this section - the same calculation Fusion's own Measure
+  // tool does on a chord across the sketch, not a doubled single radius.
+  let best = {dist: 0, a1: null, a2: null};
+  for(let i=0;i<pts.length;i++){
+    for(let j=i+1;j<pts.length;j++){
+      const dx = pts[i].x - pts[j].x;
+      const dy = pts[i].y - pts[j].y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if(d > best.dist){
+        best = {dist: d, a1: pts[i].angleDeg, a2: pts[j].angleDeg};
+      }
+    }
+  }
+  return best;
+}
+
+function updateStats(sections){
+  const div = document.getElementById('stats');
+  let html = '';
+  sections.forEach((pts,s)=>{
+    const color = colorForIndex(s, sections.length);
+    const best = maxChordDiameter(pts);
+    html += `<div><b style="color:${color}">■</b> Sec ${s+1} — max diameter <b>${best.dist.toFixed(1)}</b> mm (between ${best.a1}° and ${best.a2}°)</div>`;
+  });
+  div.innerHTML = html;
+}
+
+function recompute(){
+  const spacing = parseFloat(document.getElementById('spacing').value) || 0;
+  const numSections = getNumSections();
+  const numAngles = getNumAngles();
+  const angleStep = 360/numAngles;
+  buildLegend(numSections, spacing);
+  updateDynamicText(numSections, numAngles, angleStep, spacing);
+  const sections = computePoints();
+  drawPreview(sections);
+  updateStats(sections);
+  window._sections = sections;
+}
+
+function markerLines(pts){
+  // Shared C0/angle marker generation, used by both the straight-polygon
+  // and smooth-curve exports so both can be orientation-checked the same way.
+  const lines = [];
+  const n = pts.length;
+  const step = n > 1 ? 14 / (n - 1) : 0;
+  pts.forEach((p, idx)=>{
+    const isZero = p.angleDeg === 0;
+    const layer = isZero ? 'C0_MARK' : 'ANGLE_MARK';
+    const rad = 2 + idx * step;
+    lines.push('0','CIRCLE','8', layer, '10', p.x.toFixed(4), '20', p.y.toFixed(4), '30','0.0','40', rad.toFixed(2));
+    if(isZero){
+      lines.push('0','CIRCLE','8', layer, '10', p.x.toFixed(4), '20', p.y.toFixed(4), '30','0.0','40', (rad+6).toFixed(2));
+    }
+  });
+  const zeroPt = pts.find(p => p.angleDeg === 0);
+  if(zeroPt){
+    lines.push('0','LINE','8','C0_MARK',
+      '10','0.0','20','0.0','30','0.0',
+      '11', (zeroPt.x*1.15).toFixed(4), '21', (zeroPt.y*1.15).toFixed(4), '31','0.0');
+  }
+  return lines;
+}
+
+function dxfPolyline2D(pts){
+  const lines = ['0','SECTION','2','ENTITIES',
+    '0','POLYLINE','8','LOFT','66','1','70','1'];
+  pts.forEach(p=>{
+    lines.push('0','VERTEX','8','LOFT','10', p.x.toFixed(4), '20', p.y.toFixed(4), '30','0.0');
+  });
+  lines.push('0','SEQEND');
+  lines.push(...markerLines(pts));
+  lines.push('0','ENDSEC','0','EOF');
+  return lines.join('\n');
+}
+
+function dxf3DReference(sections, spacing){
+  const lines = ['0','SECTION','2','ENTITIES'];
+  sections.forEach((pts,s)=>{
+    lines.push('0','POLYLINE','8','REF','66','1','70','9');
+    pts.forEach(p=>{
+      lines.push('0','VERTEX','8','REF','10', p.x.toFixed(4), '20', p.y.toFixed(4), '30', (s*spacing).toFixed(4));
+    });
+    lines.push('0','SEQEND');
+  });
+  lines.push('0','ENDSEC','0','EOF');
+  return lines.join('\n');
+}
+
+function triggerDownload(filename, text){
+  const blob = new Blob([text], {type:'application/dxf'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function downloadSection(idx){
+  const sections = window._sections || computePoints();
+  const dxf = dxfPolyline2D(sections[idx]);
+  triggerDownload(`log_section_${idx+1}.dxf`, dxf);
+}
+
+function downloadReference3D(){
+  const sections = window._sections || computePoints();
+  const spacing = parseFloat(document.getElementById('spacing').value) || 0;
+  const dxf = dxf3DReference(sections, spacing);
+  triggerDownload('log_reference.dxf', dxf);
+}
+
+function fmtAngle(a){
+  return (a === Math.round(a)) ? String(Math.round(a)) : String(a);
+}
+
+function fmtXyz(v){
+  // Matches the post's xyzFormat: 3 decimals, always shown
+  return (Math.round(v*1000)/1000).toFixed(3);
+}
+function fmtAbc(v){
+  // Matches the post's abcFormat: 3 decimals, always shown, degrees
+  return (Math.round(v*1000)/1000).toFixed(3);
+}
+
+function generateGcode(){
+  const numSections = getNumSections();
+  const numAngles = getNumAngles();
+  const spacing = parseFloat(document.getElementById('spacing').value) || 0;
+  const angleStep = 360/numAngles;
+  const angles = [];
+  for(let i=0;i<numAngles;i++){ angles.push(i*angleStep); }
+
+  const now = new Date();
+  const stamp = now.toISOString().slice(0,19).replace('T',' ');
+  const lines = [
+    '(Log Profile Capture - auto-generated G-code)',
+    `(Sections: ${numSections}  Angles per section: ${numAngles}  Spacing: ${spacing}mm)`,
+    `(Generated: ${stamp})`,
+    '(Point order matches this digitizer tool exactly.)',
+    '(If section/angle settings change above, regenerate this file too -)',
+    '(do not hand-edit either one, to keep them in sync.)',
+    '(Conventions matched to LNC20210724_4axis.cps V41-NOFALLBACK.)',
+    '(Y and C combined on one line per move, per that post writeBlock.)',
+    '(M0 used for the pause - unconditional stop, not the optional M1.)',
+    '(3 decimals forced on both Y and C, per that post xyzFormat/abcFormat.)',
+    '(C free-runs continuously, no wrap or reset needed.)',
+    '(Confirmed safe per that post unwrapC - this machine C axis has no hard stop.)',
+    '(Only Y and C are commanded during point indexing below.)',
+    '(X and Z are only set once at the start, to reach G56 zero.)',
+    '(M0 always pauses, with no Optional Stop switch dependency.)',
+    '',
+    'G90 (absolute positioning)',
+    'G56 (work offset - laser/rotary setup)',
+    `G0 X${fmtXyz(0)} Y${fmtXyz(0)} Z${fmtXyz(0)} C${fmtAbc(0)}`,
+    '(Above line explicitly travels to G56 zero on every axis -)',
+    '(X/Z do not otherwise move on their own just from selecting G56.)',
+    ''
+  ];
+
+  for(let s=0;s<numSections;s++){
+    const y = s*spacing;
+    lines.push(`(--- Section ${s+1}, Y=${fmtXyz(y)}mm ---)`);
+    angles.forEach(a=>{
+      lines.push(`G0 Y${fmtXyz(y)} C${fmtAbc(a)}`);
+      lines.push(`M0 (Section ${s+1}, C=${fmtAbc(a)} deg - fire laser, then Cycle Start)`);
+    });
+    lines.push('');
+  }
+  lines.push('M30 (program end)');
+
+  triggerDownload('log_profile_capture.nc', lines.join('\n'));
+}
+
+function downloadGcode(){
+  generateGcode();
+}
+
+document.getElementById('refHeight').addEventListener('input', recompute);
+document.getElementById('spacing').addEventListener('input', recompute);
+document.getElementById('flipVertical').addEventListener('change', recompute);
+document.getElementById('reverseDir').addEventListener('change', recompute);
+document.getElementById('numSections').addEventListener('change', ()=>{ buildTable(); recompute(); });
+document.getElementById('numAngles').addEventListener('change', ()=>{ buildTable(); recompute(); });
+
+function loadImport(){
+  const status = document.getElementById('importStatus');
+  let payload;
+  try{
+    payload = JSON.parse(document.getElementById('importBox').value);
+  }catch(e){
+    status.textContent = 'Could not parse JSON — check it was pasted in full.';
+    status.style.color = '#E85FA0';
+    return;
+  }
+  if(!payload.sections || !Array.isArray(payload.sections) || !payload.sections.length){
+    status.textContent = 'JSON is missing a non-empty "sections" array.';
+    status.style.color = '#E85FA0';
+    return;
+  }
+  if(typeof payload.refHeight === 'number'){
+    document.getElementById('refHeight').value = payload.refHeight;
+  }
+  if(typeof payload.spacing === 'number'){
+    document.getElementById('spacing').value = payload.spacing;
+  }
+
+  const importedNumSections = payload.sections.length;
+  const importedNumAngles = payload.numAngles || payload.sections[0].length;
+
+  document.getElementById('numSections').value = Math.max(1, Math.min(12, importedNumSections));
+  document.getElementById('numAngles').value = Math.max(3, Math.min(36, importedNumAngles));
+  buildTable();
+
+  for(let s=0;s<importedNumSections;s++){
+    for(let i=0;i<importedNumAngles && i<payload.sections[s].length;i++){
+      const inp = document.querySelector(`#datatable input[data-s="${s}"][data-i="${i}"]`);
+      if(inp) inp.value = payload.sections[s][i];
+    }
+  }
+  recompute();
+  status.textContent = `Loaded ${importedNumSections} section(s) x ${importedNumAngles} angle(s).`;
+  status.style.color = '#5FE896';
+}
+
+buildTable();
+recompute();
+</script>
+</body>
+</html>
