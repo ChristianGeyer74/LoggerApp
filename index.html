@@ -5,7 +5,7 @@
 <title>Log Profile Digitizer</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
-
+ 
 :root{
   --bg:#0E1A29;
   --panel:#152436;
@@ -28,7 +28,7 @@ body{
   min-height:100vh;
 }
 .wrap{max-width:1180px;margin:0 auto;}
-
+ 
 header{
   display:flex;
   align-items:baseline;
@@ -48,14 +48,14 @@ h1{
 }
 h1 span{color:var(--amber);}
 .sub{color:var(--muted);font-size:13px;font-family:'JetBrains Mono',monospace;}
-
+ 
 .grid{
   display:grid;
   grid-template-columns:340px 1fr;
   gap:20px;
 }
 @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
-
+ 
 .panel{
   background:var(--panel);
   border:1px solid var(--line);
@@ -79,7 +79,7 @@ h1 span{color:var(--amber);}
   background:var(--amber);
   box-shadow:0 0 8px var(--amber);
 }
-
+ 
 label{
   display:block;
   font-size:12px;
@@ -99,6 +99,13 @@ input[type=number]{
   padding:8px 10px;
   border-radius:6px;
   outline:none;
+  appearance:textfield;
+  -moz-appearance:textfield;
+}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{
+  -webkit-appearance:none;
+  margin:0;
 }
 input[type=number]:focus{border-color:var(--amber);}
 .checkline{
@@ -107,17 +114,62 @@ input[type=number]:focus{border-color:var(--amber);}
   margin-top:2px;
 }
 .hint{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;}
-
-.legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;}
-.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--muted);}
-.dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
-
-.stats{margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);line-height:1.7;}
-.stats b{color:var(--text);}
-
+ 
+.dot{width:9px;height:9px;border-radius:2px;display:inline-block;flex:none;}
+ 
+.section-summary{margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:12px;}
+.section-summary-row{
+  display:grid;
+  grid-template-columns:14px 56px 52px 76px 1fr;
+  align-items:center;
+  gap:10px;
+  padding:6px 0;
+  border-bottom:1px solid var(--line);
+  color:var(--muted);
+}
+.section-summary-row:last-child{border-bottom:none;}
+.section-summary-row b{color:var(--text);}
+.section-summary-head{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  color:var(--muted);
+}
+ 
+.length-badge{
+  margin-top:18px;
+  padding:14px 22px;
+  background:linear-gradient(135deg, rgba(255,138,61,0.16), rgba(255,138,61,0.04));
+  border:1px solid var(--amber);
+  border-radius:10px;
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  width:fit-content;
+}
+.length-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  color:var(--muted);
+}
+.length-value{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:30px;
+  font-weight:700;
+  color:var(--amber);
+  text-shadow:0 0 16px rgba(255,138,61,0.35);
+}
+.length-unit{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  color:var(--muted);
+}
+ 
 svg{width:100%;height:auto;display:block;}
 .preview-wrap{position:relative;}
-
+ 
 .tablewrap{
   overflow-x:auto;
   margin-top:20px;
@@ -159,7 +211,7 @@ td input{
   border-radius:4px;
 }
 td input:focus{background:var(--panel-2);outline:1px solid var(--amber);}
-
+ 
 .downloads{
   margin-top:22px;
   display:flex;
@@ -186,7 +238,21 @@ button.primary{
   border-color:var(--amber);
 }
 button.primary:hover{filter:brightness(1.08);}
-
+ 
+.remove-btn{
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--muted);
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  line-height:1;
+  border-radius:5px;
+  padding:4px 9px;
+}
+.remove-btn:hover{border-color:#E85FA0;color:#E85FA0;}
+.remove-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.remove-btn:disabled:hover{border-color:var(--line);color:var(--muted);}
+ 
 .note{
   margin-top:16px;
   font-size:12px;
@@ -201,55 +267,29 @@ footer{margin-top:30px;color:var(--muted);font-size:11px;font-family:'JetBrains 
 </head>
 <body>
 <div class="wrap">
-
+ 
 <header>
   <h1>Log Profile <span>Digitizer</span></h1>
   <div class="sub" id="subHeader">horizontal-laser · 4 sections · 10-point decagon</div>
 </header>
-
+ 
 <div class="grid">
-
+ 
   <!-- LEFT: SETUP -->
   <div class="panel">
     <h2>Rig setup</h2>
     <div class="field">
       <label>Laser line height above spindle centerline (mm)</label>
-      <input type="number" id="refHeight" value="300" step="0.1">
+      <input type="number" id="refHeight" value="1020" step="0.1">
     </div>
+    <input type="hidden" id="numSections" value="4">
     <div class="field">
-      <label>Section spacing along log axis (mm)</label>
-      <input type="number" id="spacing" value="150" step="1">
+      <label>Angle points per section</label>
+      <input type="number" id="numAngles" value="10" step="1" min="3" max="36">
     </div>
-    <div class="field-row">
-      <div class="field">
-        <label>Number of sections</label>
-        <input type="number" id="numSections" value="4" step="1" min="1" max="12">
-      </div>
-      <div class="field">
-        <label>Angle points per section</label>
-        <input type="number" id="numAngles" value="10" step="1" min="3" max="36">
-      </div>
-    </div>
-    <div class="hint">Changing either of these rebuilds the table below with fresh placeholder data — enter your real measurements after adjusting.</div>
-
-    <div class="checkline" style="margin-top:12px;">
-      <input type="checkbox" id="reverseDir">
-      <label style="margin:0;" for="reverseDir">Reverse rotation indexing (flip if profile looks mirrored)</label>
-    </div>
-    <div class="checkline">
-      <input type="checkbox" id="flipVertical">
-      <label style="margin:0;" for="flipVertical">Flip vertical (Z) orientation — fixes needing to mirror the loft body after import</label>
-    </div>
-
-    <div class="legend" id="legendBox"></div>
-
-    <div class="stats" id="stats"></div>
-
-    <div class="note">
-      <b>How radius is derived:</b> the laser points straight down and always reads the distance to whichever point is currently the log's <b>top surface</b> at that rotation. So radius = laser height − measured distance. Rotating the log walks that fixed downward-looking measurement point around the material, tracing the true (non-circular) cross-section.
-    </div>
+    <div class="section-summary" id="sectionSummary"></div>
   </div>
-
+ 
   <!-- RIGHT: PREVIEW -->
   <div class="panel">
     <h2 id="previewHeading">End-on preview (all sections overlaid)</h2>
@@ -258,37 +298,47 @@ footer{margin-top:30px;color:var(--muted);font-size:11px;font-family:'JetBrains 
     </div>
     <div class="downloads" id="downloadBtns"></div>
   </div>
-
+ 
 </div>
-
+ 
 <!-- DATA TABLE -->
 <div class="panel" style="margin-top:20px;">
   <h2>Import / Export measurements</h2>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Import: paste the contents of a <code>log_digitizer_import_*.json</code> file (from a capture script, or exported below) then click Load. This overwrites the table and updates the section/angle counts to match.</div>
-  <textarea id="importBox" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;border-radius:6px;padding:8px;" placeholder='{"refHeight":300,"spacing":150,"numAngles":10,"sections":[[...values],[...],...]}'></textarea>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Import: paste the contents of a <code>log_digitizer_import_*.json</code> file (from a capture script, or exported below) then click Load. This overwrites the table and updates the section/angle counts to match. <code>"spacing"</code> is now a per-gap array (one entry shorter than the number of sections) — a single legacy number is still accepted and applied uniformly to every gap.</div>
+  <textarea id="importBox" rows="3" style="width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;border-radius:6px;padding:8px;" placeholder='{"refHeight":300,"spacing":[150,150,150],"numAngles":10,"sections":[[...values],[...],...]}'></textarea>
   <div style="margin-top:8px;"><button onclick="loadImport()">Load</button> <span id="importStatus" style="font-size:12px;color:var(--muted);margin-left:8px;"></span></div>
-  <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);">Export: save whatever's currently in the table below as a <code>log_digitizer_import_*.json</code> file — same format the Fusion spline-sketch script reads, so manually-entered data works with it too, not just the capture scripts.</div>
+  <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);">Export: save whatever's currently in the table below as a <code>log_digitizer_import_*.json</code> file — same format the Fusion spline-sketch script reads, so manually-entered data works with it too, not just the capture scripts. <b>Note:</b> if your capture/Fusion scripts assume a single uniform <code>spacing</code> number, they'll need updating to read the new per-gap array.</div>
   <div style="margin-top:8px;"><button onclick="exportMeasurementsJSON()">Export current table as JSON</button></div>
 </div>
-
+ 
 <div class="panel tablewrap" style="margin-top:20px;">
   <h2>Measured distance: laser line → log <u>top</u> surface (mm)</h2>
   <table id="datatable"></table>
+ 
+  <div style="margin-top:14px;">
+    <button onclick="addSection()">+ Add section</button>
+    <span id="addSectionHint" style="font-size:12px;color:var(--muted);margin-left:8px;"></span>
+  </div>
+ 
+  <div class="length-badge">
+    <span class="length-label">Computed Log Length</span>
+    <span class="length-value" id="overallLength">0</span><span class="length-unit">mm</span>
+  </div>
 </div>
-
+ 
 <div class="note" style="max-width:900px;">
   <b>Using this in Fusion 360:</b> the simplest path is the combined <b>3D reference</b> file below — import it as a 3D sketch, apply the mirror step described next, then <b>Loft</b> across all the profiles directly from that one sketch. The per-section files above (create <span id="planeCountLabel">4</span> offset planes along your loft axis at Y = <span id="zListSummary">0, 150, 300, 450 mm</span>, insert one section DXF per plane) are the alternative if you'd rather work plane-by-plane instead. For a single-face smooth loft instead of a faceted one, use the separate Fusion spline-sketch script rather than these DXF exports.
   <br><br>
   <b>Orientation:</b> the 0° reading (first laser measurement, before any rotation) is exported straight up the sketch's local +Y axis, matching the physical "top of log" position. After importing the 3D reference sketch, apply <b>Modify → Mirror</b> across the origin <b>XY plane</b> once — this has been confirmed to correct the orientation reliably. Do this every time as a standard step; it's a single consistent correction, not something to chase out of the export file.
   <br><br>
-  <b>If you've had to mirror the finished loft body through the XY plane to make it look right:</b> that's a sign your planes' local Y is mapping to global −Z instead of +Z, flipping "top of log" to "bottom of log" on import. Rather than mirroring the assembled 3D body after the fact each time, tick <b>"Flip vertical (Z) orientation"</b> above and re-download the section DXFs — this corrects it at the source, before it ever reaches Fusion, so the loft comes out right without a manual mirror step.
+  <b>If you've had to mirror the finished loft body through the XY plane to make it look right:</b> that's a sign your planes' local Y is mapping to global −Z instead of +Z, flipping "top of log" to "bottom of log" on import. The digitizer's vertical (Z) orientation is currently fixed to the un-flipped convention, so continue applying the <b>Modify → Mirror</b> step above each time rather than looking for a toggle here.
   <br><br>
   <b>Verifying orientation after import:</b> Fusion's DXF importer silently drops TEXT and POINT entities (it only keeps solids/curves/surfaces/meshes) — so instead of text labels, each section DXF marks every point with a small <b>circle</b>, sized to grow from smallest (0°) to largest around the sequence, plus a <b>radial line</b> pointing straight at the 0° point with a double-ringed circle marking it specifically. After inserting a sketch, find the double-ring circle — that's your C=0 reference — and check that the radial line points the same real-world direction (relative to your known headstock/tailstock/up reference) on every section. These markers sit on their own layers (C0_MARK, ANGLE_MARK) so you can hide them once orientation's confirmed, without touching the profile geometry itself.
 </div>
-
+ 
 <footer id="footerText">10 points per section · 36° increments · values are example placeholders until you overwrite them</footer>
 </div>
-
+ 
 <script>
 function getNumSections(){
   let n = parseInt(document.getElementById('numSections').value) || 4;
@@ -300,11 +350,67 @@ function getNumAngles(){
   n = Math.max(3, Math.min(36, n));
   return n;
 }
+function getNumGaps(){
+  return Math.max(0, getNumSections() - 1);
+}
+function getSpacings(){
+  const numGaps = getNumGaps();
+  const gaps = new Array(numGaps).fill(150);
+  document.querySelectorAll('#datatable input[data-gap]').forEach(inp=>{
+    const g = +inp.dataset.gap;
+    if(g < numGaps) gaps[g] = parseFloat(inp.value) || 0;
+  });
+  return gaps;
+}
+function addSection(){
+  const cur = getNumSections();
+  const next = Math.min(12, cur + 1);
+  document.getElementById('numSections').value = next;
+  buildTable();
+  recompute();
+  const hint = document.getElementById('addSectionHint');
+  if(hint) hint.textContent = (next === 12 && cur === 12) ? 'Maximum of 12 sections reached.' : '';
+}
+function removeSection(idx){
+  const numSections = getNumSections();
+  if(numSections <= 1) return;
+  const gaps = getSpacings();
+  let newGaps;
+  if(idx === 0){
+    // Removing the first section: the gap that used to lead into it is gone,
+    // the rest of the gaps are untouched.
+    newGaps = gaps.slice(1);
+  } else if(idx === numSections - 1){
+    // Removing the last section: drop the gap leading into it.
+    newGaps = gaps.slice(0, gaps.length - 1);
+  } else {
+    // Removing an interior section: merge the gap before and after it so the
+    // remaining sections keep their true physical spacing (Y positions don't
+    // shift), instead of just discarding one of the two adjacent gaps.
+    newGaps = gaps.slice(0, idx - 1).concat([gaps[idx - 1] + gaps[idx]]).concat(gaps.slice(idx + 1));
+  }
+  document.getElementById('numSections').value = numSections - 1;
+  buildTable();
+  document.querySelectorAll('#datatable input[data-gap]').forEach(inp=>{
+    const g = +inp.dataset.gap;
+    if(newGaps[g] !== undefined) inp.value = newGaps[g];
+  });
+  recompute();
+}
+function getCumulativeY(){
+  const numSections = getNumSections();
+  const gaps = getSpacings();
+  const ys = [0];
+  for(let s=1; s<numSections; s++){
+    ys.push(ys[s-1] + (gaps[s-1] || 0));
+  }
+  return ys;
+}
 function colorForIndex(i, total){
   const hue = Math.round((360 * i / Math.max(total, 1)) % 360);
   return `hsl(${hue}, 68%, 62%)`;
 }
-
+ 
 function generateDefaultRow(numAngles, seedOffset){
   const base = 220;
   const row = [];
@@ -315,16 +421,7 @@ function generateDefaultRow(numAngles, seedOffset){
   }
   return row;
 }
-
-function buildLegend(numSections, spacing){
-  const box = document.getElementById('legendBox');
-  let html = '';
-  for(let s=0;s<numSections;s++){
-    html += `<div class="legend-item"><span class="dot" style="background:${colorForIndex(s,numSections)}"></span>Section ${s+1} · Y=${Math.round(s*spacing)}</div>`;
-  }
-  box.innerHTML = html;
-}
-
+ 
 function buildDownloadButtons(numSections){
   const box = document.getElementById('downloadBtns');
   let html = '';
@@ -335,28 +432,44 @@ function buildDownloadButtons(numSections){
   html += `<button onclick="downloadGcode()">Generate G-code for this setup</button>`;
   box.innerHTML = html;
 }
-
+ 
 function buildTable(){
   const numSections = getNumSections();
   const numAngles = getNumAngles();
   const angleStep = 360/numAngles;
   const table = document.getElementById('datatable');
-  let html = '<tr><th style="text-align:left;">Section</th>';
+ 
+  // Gap values are rig setup, not placeholder measurement data — preserve
+  // them across a rebuild instead of resetting to defaults like the angle
+  // measurement cells do.
+  const oldGapVals = {};
+  table.querySelectorAll('input[data-gap]').forEach(inp=>{
+    oldGapVals[+inp.dataset.gap] = inp.value;
+  });
+ 
+  let html = '<tr><th style="text-align:left;">Section</th><th>Gap → next (mm)</th>';
   for(let i=0;i<numAngles;i++){ html += `<th>${Math.round(i*angleStep)}°</th>`; }
-  html += '</tr>';
+  html += '<th></th></tr>';
   for(let s=0;s<numSections;s++){
     const rowDefaults = generateDefaultRow(numAngles, s*23);
     html += `<tr><td class="rowhead" style="border-left:3px solid ${colorForIndex(s,numSections)};">Section ${s+1}</td>`;
+    if(s < numSections-1){
+      const gv = (oldGapVals[s] !== undefined) ? oldGapVals[s] : 150;
+      html += `<td><input type="number" step="1" data-gap="${s}" value="${gv}" oninput="recompute()" style="width:72px;"></td>`;
+    } else {
+      html += `<td style="color:var(--muted);font-size:11px;">—</td>`;
+    }
     for(let i=0;i<numAngles;i++){
       html += `<td><input type="number" step="0.1" data-s="${s}" data-i="${i}" value="${rowDefaults[i]}" onchange="recompute()"></td>`;
     }
+    const disabled = numSections <= 1 ? 'disabled title="At least one section is required"' : `title="Remove section ${s+1}"`;
+    html += `<td><button class="remove-btn" onclick="removeSection(${s})" ${disabled}>×</button></td>`;
     html += '</tr>';
   }
   table.innerHTML = html;
-  buildLegend(numSections, parseFloat(document.getElementById('spacing').value)||0);
   buildDownloadButtons(numSections);
 }
-
+ 
 function getMeasurements(numSections, numAngles){
   const vals = [];
   for(let s=0;s<numSections;s++) vals.push(new Array(numAngles).fill(0));
@@ -366,21 +479,23 @@ function getMeasurements(numSections, numAngles){
   });
   return vals;
 }
-
+ 
 function exportMeasurementsJSON(){
   const numSections = getNumSections();
   const numAngles = getNumAngles();
   const refHeight = parseFloat(document.getElementById('refHeight').value) || 0;
-  const spacing = parseFloat(document.getElementById('spacing').value) || 0;
   const sections = getMeasurements(numSections, numAngles);
-  const payload = { refHeight, spacing, numAngles, sections };
+  const payload = { refHeight, spacing: getSpacings(), numAngles, sections };
   triggerDownload(`log_digitizer_import_${Date.now()}.json`, JSON.stringify(payload, null, 2));
 }
-
+ 
 function computePoints(){
   const H = parseFloat(document.getElementById('refHeight').value) || 0;
-  const rev = document.getElementById('reverseDir').checked ? -1 : 1;
-  const flipV = document.getElementById('flipVertical').checked ? -1 : 1;
+  // "Reverse rotation indexing" and "Flip vertical (Z) orientation" were
+  // removed as UI toggles; both defaulted to unchecked, so that behavior
+  // (no reverse, no flip) is now baked in here instead.
+  const rev = 1;
+  const flipV = 1;
   const numSections = getNumSections();
   const numAngles = getNumAngles();
   const angleStep = 360/numAngles;
@@ -397,14 +512,14 @@ function computePoints(){
   }
   return sections;
 }
-
+ 
 function drawPreview(sections){
   const svg = document.getElementById('preview');
   const size = 520, c = size/2;
   let maxR = 10;
   sections.forEach(pts => pts.forEach(p => { maxR = Math.max(maxR, Math.abs(p.x), Math.abs(p.y)); }));
   const scale = (size*0.42) / maxR;
-
+ 
   let el = '';
   for(let g=1; g<=4; g++){
     const rr = (maxR*scale) * (g/4);
@@ -412,7 +527,7 @@ function drawPreview(sections){
   }
   el += `<line x1="${c-size*0.46}" y1="${c}" x2="${c+size*0.46}" y2="${c}" stroke="#28405C" stroke-width="1"/>`;
   el += `<line x1="${c}" y1="${c-size*0.46}" x2="${c}" y2="${c+size*0.46}" stroke="#28405C" stroke-width="1"/>`;
-
+ 
   sections.forEach((pts, s)=>{
     const color = colorForIndex(s, sections.length);
     const path = pts.map((p,idx)=> `${idx===0?'M':'L'} ${c+p.x*scale} ${c - p.y*scale}`).join(' ') + ' Z';
@@ -421,26 +536,24 @@ function drawPreview(sections){
       el += `<circle cx="${c+p.x*scale}" cy="${c-p.y*scale}" r="2.5" fill="${color}"/>`;
     });
   });
-
+ 
   el += `<circle cx="${c}" cy="${c}" r="3" fill="#E7EEF5"/>`;
   el += `<text x="${c+8}" y="${c-8}" fill="#84A0BE" font-family="JetBrains Mono" font-size="10">spindle axis</text>`;
-
+ 
   svg.innerHTML = el;
 }
-
-function updateDynamicText(numSections, numAngles, angleStep, spacing){
+ 
+function updateDynamicText(numSections, numAngles, angleStep, ys){
   document.getElementById('subHeader').textContent =
     `horizontal-laser · ${numSections} section${numSections!==1?'s':''} · ${numAngles}-point profile`;
   document.getElementById('footerText').textContent =
     `${numAngles} points per section · ${angleStep.toFixed(1)}° increments · values are example placeholders until you overwrite them`;
   document.getElementById('previewHeading').textContent =
     `End-on preview (all ${numSections} section${numSections!==1?'s':''} overlaid)`;
-  const zs = [];
-  for(let s=0;s<numSections;s++) zs.push(Math.round(s*spacing));
-  document.getElementById('zListSummary').textContent = zs.join(', ') + ' mm';
+  document.getElementById('zListSummary').textContent = ys.map(v=>Math.round(v)).join(', ') + ' mm';
   document.getElementById('planeCountLabel').textContent = numSections;
 }
-
+ 
 function maxChordDiameter(pts){
   // True geometric "diameter": largest straight-line distance between any
   // two points in this section - the same calculation Fusion's own Measure
@@ -458,31 +571,44 @@ function maxChordDiameter(pts){
   }
   return best;
 }
-
-function updateStats(sections){
-  const div = document.getElementById('stats');
-  let html = '';
-  sections.forEach((pts,s)=>{
-    const color = colorForIndex(s, sections.length);
+ 
+function buildSectionSummary(sections, ys){
+  const box = document.getElementById('sectionSummary');
+  const numSections = sections.length;
+  let html = `<div class="section-summary-row section-summary-head"><span></span><span>Section</span><span>Y (mm)</span><span>Max Ø (mm)</span><span>Between</span></div>`;
+  sections.forEach((pts, s)=>{
+    const color = colorForIndex(s, numSections);
     const best = maxChordDiameter(pts);
-    html += `<div><b style="color:${color}">■</b> Sec ${s+1} — max diameter <b>${best.dist.toFixed(1)}</b> mm (between ${best.a1}° and ${best.a2}°)</div>`;
+    html += `<div class="section-summary-row">
+      <span class="dot" style="background:${color}"></span>
+      <span><b>Sec ${s+1}</b></span>
+      <span>${Math.round(ys[s])}</span>
+      <span><b>${best.dist.toFixed(1)}</b></span>
+      <span>${best.a1}° ↔ ${best.a2}°</span>
+    </div>`;
   });
-  div.innerHTML = html;
+  box.innerHTML = html;
 }
-
+ 
 function recompute(){
-  const spacing = parseFloat(document.getElementById('spacing').value) || 0;
   const numSections = getNumSections();
   const numAngles = getNumAngles();
   const angleStep = 360/numAngles;
-  buildLegend(numSections, spacing);
-  updateDynamicText(numSections, numAngles, angleStep, spacing);
+  const ys = getCumulativeY();
+  updateDynamicText(numSections, numAngles, angleStep, ys);
+  updateOverallLength(ys);
   const sections = computePoints();
   drawPreview(sections);
-  updateStats(sections);
+  buildSectionSummary(sections, ys);
   window._sections = sections;
+  window._ys = ys;
 }
-
+ 
+function updateOverallLength(ys){
+  const total = ys.length ? ys[ys.length-1] : 0;
+  document.getElementById('overallLength').textContent = total.toFixed(1);
+}
+ 
 function markerLines(pts){
   // Shared C0/angle marker generation, used by both the straight-polygon
   // and smooth-curve exports so both can be orientation-checked the same way.
@@ -506,7 +632,7 @@ function markerLines(pts){
   }
   return lines;
 }
-
+ 
 function dxfPolyline2D(pts){
   const lines = ['0','SECTION','2','ENTITIES',
     '0','POLYLINE','8','LOFT','66','1','70','1'];
@@ -518,20 +644,20 @@ function dxfPolyline2D(pts){
   lines.push('0','ENDSEC','0','EOF');
   return lines.join('\n');
 }
-
-function dxf3DReference(sections, spacing){
+ 
+function dxf3DReference(sections, ys){
   const lines = ['0','SECTION','2','ENTITIES'];
   sections.forEach((pts,s)=>{
     lines.push('0','POLYLINE','8','REF','66','1','70','9');
     pts.forEach(p=>{
-      lines.push('0','VERTEX','8','REF','10', p.x.toFixed(4), '20', p.y.toFixed(4), '30', (s*spacing).toFixed(4));
+      lines.push('0','VERTEX','8','REF','10', p.x.toFixed(4), '20', p.y.toFixed(4), '30', ys[s].toFixed(4));
     });
     lines.push('0','SEQEND');
   });
   lines.push('0','ENDSEC','0','EOF');
   return lines.join('\n');
 }
-
+ 
 function triggerDownload(filename, text){
   const blob = new Blob([text], {type:'application/dxf'});
   const url = URL.createObjectURL(blob);
@@ -540,24 +666,24 @@ function triggerDownload(filename, text){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-
+ 
 function downloadSection(idx){
   const sections = window._sections || computePoints();
   const dxf = dxfPolyline2D(sections[idx]);
   triggerDownload(`log_section_${idx+1}.dxf`, dxf);
 }
-
+ 
 function downloadReference3D(){
   const sections = window._sections || computePoints();
-  const spacing = parseFloat(document.getElementById('spacing').value) || 0;
-  const dxf = dxf3DReference(sections, spacing);
+  const ys = window._ys || getCumulativeY();
+  const dxf = dxf3DReference(sections, ys);
   triggerDownload('log_reference.dxf', dxf);
 }
-
+ 
 function fmtAngle(a){
   return (a === Math.round(a)) ? String(Math.round(a)) : String(a);
 }
-
+ 
 function fmtXyz(v){
   // Matches the post's xyzFormat: 3 decimals, always shown
   return (Math.round(v*1000)/1000).toFixed(3);
@@ -566,20 +692,22 @@ function fmtAbc(v){
   // Matches the post's abcFormat: 3 decimals, always shown, degrees
   return (Math.round(v*1000)/1000).toFixed(3);
 }
-
+ 
 function generateGcode(){
   const numSections = getNumSections();
   const numAngles = getNumAngles();
-  const spacing = parseFloat(document.getElementById('spacing').value) || 0;
+  const ys = getCumulativeY();
+  const gaps = getSpacings();
+  const gapsSummary = gaps.length ? gaps.join(', ') : 'n/a (single section)';
   const angleStep = 360/numAngles;
   const angles = [];
   for(let i=0;i<numAngles;i++){ angles.push(i*angleStep); }
-
+ 
   const now = new Date();
   const stamp = now.toISOString().slice(0,19).replace('T',' ');
   const lines = [
     '(Log Profile Capture - auto-generated G-code)',
-    `(Sections: ${numSections}  Angles per section: ${numAngles}  Spacing: ${spacing}mm)`,
+    `(Sections: ${numSections}  Angles per section: ${numAngles}  Gaps (mm): ${gapsSummary})`,
     `(Generated: ${stamp})`,
     '(Point order matches this digitizer tool exactly.)',
     '(If section/angle settings change above, regenerate this file too -)',
@@ -601,9 +729,9 @@ function generateGcode(){
     '(X/Z do not otherwise move on their own just from selecting G56.)',
     ''
   ];
-
+ 
   for(let s=0;s<numSections;s++){
-    const y = s*spacing;
+    const y = ys[s];
     lines.push(`(--- Section ${s+1}, Y=${fmtXyz(y)}mm ---)`);
     angles.forEach(a=>{
       lines.push(`G0 Y${fmtXyz(y)} C${fmtAbc(a)}`);
@@ -612,21 +740,17 @@ function generateGcode(){
     lines.push('');
   }
   lines.push('M30 (program end)');
-
+ 
   triggerDownload('log_profile_capture.nc', lines.join('\n'));
 }
-
+ 
 function downloadGcode(){
   generateGcode();
 }
-
+ 
 document.getElementById('refHeight').addEventListener('input', recompute);
-document.getElementById('spacing').addEventListener('input', recompute);
-document.getElementById('flipVertical').addEventListener('change', recompute);
-document.getElementById('reverseDir').addEventListener('change', recompute);
-document.getElementById('numSections').addEventListener('change', ()=>{ buildTable(); recompute(); });
 document.getElementById('numAngles').addEventListener('change', ()=>{ buildTable(); recompute(); });
-
+ 
 function loadImport(){
   const status = document.getElementById('importStatus');
   let payload;
@@ -645,17 +769,32 @@ function loadImport(){
   if(typeof payload.refHeight === 'number'){
     document.getElementById('refHeight').value = payload.refHeight;
   }
-  if(typeof payload.spacing === 'number'){
-    document.getElementById('spacing').value = payload.spacing;
-  }
-
+ 
   const importedNumSections = payload.sections.length;
   const importedNumAngles = payload.numAngles || payload.sections[0].length;
-
+ 
   document.getElementById('numSections').value = Math.max(1, Math.min(12, importedNumSections));
   document.getElementById('numAngles').value = Math.max(3, Math.min(36, importedNumAngles));
   buildTable();
-
+ 
+  // "spacing" is now a per-gap array; a legacy single number is still
+  // accepted here and applied uniformly to every gap for backward compat.
+  const numGaps = getNumGaps();
+  if(numGaps > 0 && payload.spacing !== undefined){
+    let gapVals = null;
+    if(Array.isArray(payload.spacing)){
+      gapVals = payload.spacing;
+    }else if(typeof payload.spacing === 'number'){
+      gapVals = new Array(numGaps).fill(payload.spacing);
+    }
+    if(gapVals){
+      for(let g=0; g<numGaps; g++){
+        const inp = document.querySelector(`#datatable input[data-gap="${g}"]`);
+        if(inp && gapVals[g] !== undefined) inp.value = gapVals[g];
+      }
+    }
+  }
+ 
   for(let s=0;s<importedNumSections;s++){
     for(let i=0;i<importedNumAngles && i<payload.sections[s].length;i++){
       const inp = document.querySelector(`#datatable input[data-s="${s}"][data-i="${i}"]`);
@@ -666,9 +805,10 @@ function loadImport(){
   status.textContent = `Loaded ${importedNumSections} section(s) x ${importedNumAngles} angle(s).`;
   status.style.color = '#5FE896';
 }
-
+ 
 buildTable();
 recompute();
 </script>
 </body>
 </html>
+ 
