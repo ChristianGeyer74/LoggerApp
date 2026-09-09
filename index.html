@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -317,7 +318,6 @@ footer{margin-top:30px;color:var(--muted);font-size:11px;font-family:'JetBrains 
  
   <div style="margin-top:14px;">
     <button onclick="addSection()">+ Add section</button>
-    <span id="addSectionHint" style="font-size:12px;color:var(--muted);margin-left:8px;"></span>
   </div>
  
   <div class="length-badge">
@@ -342,7 +342,7 @@ footer{margin-top:30px;color:var(--muted);font-size:11px;font-family:'JetBrains 
 <script>
 function getNumSections(){
   let n = parseInt(document.getElementById('numSections').value) || 4;
-  n = Math.max(1, Math.min(12, n));
+  n = Math.max(1, n);
   return n;
 }
 function getNumAngles(){
@@ -363,13 +363,10 @@ function getSpacings(){
   return gaps;
 }
 function addSection(){
-  const cur = getNumSections();
-  const next = Math.min(12, cur + 1);
+  const next = getNumSections() + 1;
   document.getElementById('numSections').value = next;
   buildTable();
   recompute();
-  const hint = document.getElementById('addSectionHint');
-  if(hint) hint.textContent = (next === 12 && cur === 12) ? 'Maximum of 12 sections reached.' : '';
 }
 function removeSection(idx){
   const numSections = getNumSections();
@@ -698,7 +695,7 @@ function generateGcode(){
   const numAngles = getNumAngles();
   const ys = getCumulativeY();
   const gaps = getSpacings();
-  const gapsSummary = gaps.length ? gaps.join(', ') : 'n/a (single section)';
+  const gapsSummary = gaps.length ? gaps.join(', ') : 'n/a - single section';
   const angleStep = 360/numAngles;
   const angles = [];
   for(let i=0;i<numAngles;i++){ angles.push(i*angleStep); }
@@ -707,7 +704,7 @@ function generateGcode(){
   const stamp = now.toISOString().slice(0,19).replace('T',' ');
   const lines = [
     '(Log Profile Capture - auto-generated G-code)',
-    `(Sections: ${numSections}  Angles per section: ${numAngles}  Gaps (mm): ${gapsSummary})`,
+    `(Sections: ${numSections}  Angles per section: ${numAngles}  Gap mm values: ${gapsSummary})`,
     `(Generated: ${stamp})`,
     '(Point order matches this digitizer tool exactly.)',
     '(If section/angle settings change above, regenerate this file too -)',
@@ -773,7 +770,7 @@ function loadImport(){
   const importedNumSections = payload.sections.length;
   const importedNumAngles = payload.numAngles || payload.sections[0].length;
  
-  document.getElementById('numSections').value = Math.max(1, Math.min(12, importedNumSections));
+  document.getElementById('numSections').value = Math.max(1, importedNumSections);
   document.getElementById('numAngles').value = Math.max(3, Math.min(36, importedNumAngles));
   buildTable();
  
@@ -811,4 +808,3 @@ recompute();
 </script>
 </body>
 </html>
- 
